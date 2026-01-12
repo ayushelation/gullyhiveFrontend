@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 
 
 export class AuthService {
-  private apiUrl = '/api/auth';
+  private apiUrl = 'https://gullyhivebackend-irfi.onrender.com/api/auth';
 
   constructor(private http: HttpClient, private router: Router) {}
 

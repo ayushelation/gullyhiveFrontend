@@ -49,7 +49,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
 
   // API Configuration
-  private readonly apiUrl = 'https://localhost:7252/api'; // Change to your .NET Core 8 API URL
+  private readonly apiUrl = 'https://gullyhivebackend-irfi.onrender.com/api'; // Change to your .NET Core 8 API URL
   // Common .NET Core ports: 7045, 5000, 5001, 7245
 
 

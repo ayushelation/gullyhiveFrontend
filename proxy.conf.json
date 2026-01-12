@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "https://localhost:7252",
+    "target": "https://gullyhivebackend-irfi.onrender.com",
     "secure": false,
     "changeOrigin": true
   }
