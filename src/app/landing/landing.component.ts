@@ -50,7 +50,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
 
   // API Configuration
-  private readonly apiUrl = `${environment.apiBaseUrl}`; // Change to your .NET Core 8 API URL
+  private readonly apiUrl = `${environment.apiBaseUrl}`; 
   // Common .NET Core ports: 7045, 5000, 5001, 7245
 
 
