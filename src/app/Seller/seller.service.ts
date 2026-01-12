@@ -152,7 +152,7 @@ export interface Referral {
   providedIn: 'root'
 })
 export class SellerService {
-  private apiUrl = 'https://localhost:7252/api/seller';
+  private apiUrl = 'https://gullyhivebackend-irfi.onrender.com/api/seller';
   
  // BehaviorSubject will store sellerId and emit it to subscribers
   private sellerIdSubject = new BehaviorSubject<number | null>(null);

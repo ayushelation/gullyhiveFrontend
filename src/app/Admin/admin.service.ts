@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = '/api/home';
+  private apiUrl = 'https://gullyhivebackend-irfi.onrender.com/api/home';
 
   constructor(private http: HttpClient) {}
 
