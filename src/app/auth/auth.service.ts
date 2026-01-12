@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 
 
 
 export class AuthService {
-  private apiUrl = 'https://gullyhivebackend-irfi.onrender.com/api/auth';
+  private apiUrl = `${environment.apiBaseUrl}/auth`;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -65,7 +66,7 @@ export class AuthService {
  
 //   }
 submitRegistration(formData: FormData) {
-  return this.http.post('/api/auth/register', formData);
+  return this.http.post(`${this.apiUrl}/register`, formData);
   // DO NOT set Content-Type: let Angular handle multipart/form-data
 }
 

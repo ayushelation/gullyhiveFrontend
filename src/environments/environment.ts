@@ -1,5 +1,5 @@
 // src/environments/environment.ts
 export const environment = {
   production: false,
-  apiUrl: 'https://gullyhivebackend-irfi.onrender.com/api'
+  apiBaseUrl: 'https://gullyhivebackend-irfi.onrender.com/api'
 };

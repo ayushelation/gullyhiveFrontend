@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Subscription } from 'rxjs';
+import { environment } from '../../environments/environment'
 
 
 import {  Inject, PLATFORM_ID } from '@angular/core';
@@ -49,7 +50,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
 
   // API Configuration
-  private readonly apiUrl = 'https://gullyhivebackend-irfi.onrender.com/api'; // Change to your .NET Core 8 API URL
+  private readonly apiUrl = `${environment.apiBaseUrl}`; // Change to your .NET Core 8 API URL
   // Common .NET Core ports: 7045, 5000, 5001, 7245
 
 
