@@ -1,0 +1,19 @@
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">
+      Welcome back, {{ user?.name || 'Seller' }}! 👋
+    </h1>
+    <p class="text-gray-600">Here's what's happening with your business today.</p>
+  </div>
+
+  <!-- Child Components -->
+  <app-profile-completion [user]="user"></app-profile-completion>
+  <app-stats-cards [user]="user"></app-stats-cards>
+  <app-quick-actions [user]="user"></app-quick-actions>
+<!-- <app-quick-actions [userId]="user?.id"></app-quick-actions> -->
+  <app-recent-leads [user]="user"></app-recent-leads>
+</div>
+
+
+

@@ -1,0 +1,44 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { SellerRoutingModule } from './seller-routing.module';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { StatsCardsComponent } from './stats-cards/stats-cards.component';
+import { ProfileCompletionComponent } from './profile-completion/profile-completion.component';
+import { QuickActionsComponent } from './quick-actions/quick-actions.component';
+import { RecentLeadsComponent } from './recent-leads/recent-leads.component';
+import { PublicProfileComponent } from './public-profile/public-profile.component';
+import { SettingsComponent } from './settings/settings.component';
+import { EditProfileComponent } from './settings/edit-profile/edit-profile.component';
+import { RouterModule } from '@angular/router';
+import { LeadsComponent } from './leads/leads.component';
+import { ResponsesComponent } from './responses/responses.component';
+import { HelpComponent } from './help/help.component';
+import { ReferEarnComponent } from './refer-earn/refer-earn.component';
+import { ReactiveFormsModule } from '@angular/forms'; //
+import { FormsModule } from '@angular/forms';
+
+@NgModule({
+  declarations: [
+    DashboardComponent,
+    StatsCardsComponent,
+    ProfileCompletionComponent,
+    QuickActionsComponent,
+    RecentLeadsComponent,
+    PublicProfileComponent,
+    SettingsComponent,
+    EditProfileComponent,
+    LeadsComponent,
+    ResponsesComponent,
+    HelpComponent,
+    ReferEarnComponent
+  ],
+  imports: [
+    CommonModule,
+    SellerRoutingModule,
+     RouterModule, // needed for routerLink
+    ReactiveFormsModule,
+    FormsModule
+  ]
+})
+export class SellerModule {}

@@ -1,0 +1,65 @@
+/* IMPORTANT: All @import statements MUST come first */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css');
+
+/* Then Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animations */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Remove number input arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Font classes */
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom Components */
+@layer components {
+  .login-input {
+    @apply w-full px-3 py-2 border-2 border-gray-200 rounded-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:ring-opacity-50 outline-none transition-all duration-200;
+  }
+  
+  .login-button {
+    @apply w-full py-1.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-sm hover:from-primary-700 hover:to-primary-800 transform hover:-translate-y-0.5 transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+  
+  .social-button {
+    @apply w-full py-1.5 border-2 border-gray-200 rounded-sm font-medium flex items-center justify-center gap-3 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200;
+  }
+  
+  .checkbox-custom {
+    @apply w-5 h-5 border-2 border-gray-300 rounded-sm flex items-center justify-center transition-all duration-200;
+  }
+  
+  .checkbox-custom-checked {
+    @apply bg-primary-500 border-primary-500;
+  }
+}

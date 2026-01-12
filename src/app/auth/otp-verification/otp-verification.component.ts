@@ -1,0 +1,172 @@
+
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
+  ViewChildren,
+  QueryList,
+  ElementRef,
+  Inject,
+  PLATFORM_ID
+} from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { interval, Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-otp-verification',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+   // imports: [CommonModule],
+  templateUrl: './otp-verification.component.html'
+})
+export class OTPVerificationComponent implements OnInit, OnDestroy {
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  @Input() mobile = '';
+  @Output() onVerified = new EventEmitter<void>();
+  @Output() onBack = new EventEmitter<void>();
+
+  @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
+  otp: string[] = Array(6).fill('');
+  timer = 60;
+  canResend = false;
+  isVerifying = false;
+  error = '';
+
+  private timerSubscription: Subscription | null = null;
+
+  ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.startTimer();
+      setTimeout(() => this.focusInput(0), 0);
+    }
+  }
+
+  ngOnDestroy() {
+    this.stopTimer();
+  }
+
+  startTimer() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    this.timerSubscription = interval(1000).subscribe(() => {
+      if (this.timer > 0) {
+        this.timer--;
+      } else {
+        this.canResend = true;
+        this.stopTimer();
+      }
+    });
+  }
+
+  stopTimer() {
+    this.timerSubscription?.unsubscribe();
+  }
+
+  focusInput(index: number) {
+    const input = this.otpInputs?.toArray()[index];
+    if (input) input.nativeElement.focus();
+  }
+
+
+onInputChange(event: Event, index: number) {
+  const input = event.target as HTMLInputElement;
+  const value = input.value.replace(/\D/g, '').slice(-1);
+
+  // ✅ STORE the digit
+  this.otp[index] = value;
+  this.error = '';
+
+  // Move forward
+  if (value && index < 5) {
+    this.focusInput(index + 1);
+  }
+}
+
+ onKeyDown(event: KeyboardEvent, index: number) {
+
+
+  // ⬅️ Move left
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    if (index > 0) {
+      this.focusInput(index - 1);
+    }
+    return;
+  }
+
+  // ➡️ Move right
+  if (event.key === 'ArrowRight') {
+    event.preventDefault();
+    if (index < 5) {
+      this.focusInput(index + 1);
+    }
+    return;
+  }
+
+  if (event.key === 'Backspace') {
+    if (this.otp[index]) {
+      // Clear current box
+      this.otp[index] = '';
+    } else if (index > 0) {
+      // Go to previous box
+      this.focusInput(index - 1);
+      this.otp[index - 1] = '';
+    }
+  }
+}
+
+
+  onPaste(event: ClipboardEvent) {
+    event.preventDefault();
+    const clipboardData = event.clipboardData;
+    if (!clipboardData) return;
+
+    const pastedData = clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    pastedData.split('').forEach((char, i) => {
+      this.otp[i] = char;
+    });
+
+    setTimeout(() => this.focusInput(Math.min(pastedData.length, 5)), 0);
+  }
+
+ onVerify() {
+  const otpValue = this.otp.join('');
+
+  if (otpValue.length !== 6) {
+    this.error = 'Please enter complete OTP';
+    return;
+  }
+
+  this.isVerifying = true;
+  this.error = '';
+
+  setTimeout(() => {
+    this.isVerifying = false;
+    this.onVerified.emit();
+  }, 1500);
+}
+
+  onResend() {
+    this.timer = 60;
+    this.canResend = false;
+    this.otp = Array(6).fill('');
+    this.error = '';
+
+    this.stopTimer();
+    this.startTimer();
+
+    setTimeout(() => this.focusInput(0), 0);
+  }
+  
+  trackByIndex(index: number) {
+  return index;
+}
+
+}

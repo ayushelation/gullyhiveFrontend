@@ -1,0 +1,92 @@
+// import { CommonModule } from '@angular/common';
+// import { Component } from '@angular/core';
+// import { RouterOutlet, RouterModule } from '@angular/router';
+// import { SellerService } from '../seller.service';
+
+// @Component({
+//   selector: 'app-seller-layout',
+//   standalone: true,
+//   imports: [RouterOutlet, RouterModule,CommonModule],
+//   templateUrl: './seller-layout.component.html'
+// })
+// export class SellerLayoutComponent {
+//    showUserMenu = false;
+//   user: any;
+//   toggleUserMenu() {
+//     this.showUserMenu = !this.showUserMenu;
+//   }
+
+//   logout() {
+//     // simple redirect for now
+//     window.location.href = '/';
+//   }
+// constructor(private sellerService: SellerService) {}
+//     profiledData(): void {
+//     this.sellerService.getDashboardData().subscribe({
+//       next: dashboard => {
+//         console.log('Dashboard data:', dashboard);
+//         this.user = dashboard; // 👈 STORE FULL DASHBOARD
+//       },
+//       error: err => console.error('Failed to load dashboard data', err)
+//     });
+//   }
+
+// }
+
+
+import { Component, OnInit } from '@angular/core';
+import { RouterOutlet, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { SellerService } from '../seller.service';
+
+@Component({
+  selector: 'app-seller-layout',
+  standalone: true,
+  imports: [RouterOutlet, RouterModule, CommonModule],
+  templateUrl: './seller-layout.component.html'
+})
+export class SellerLayoutComponent implements OnInit {
+  showUserMenu = false;
+  user: any;
+   sellerId!: number;
+
+  constructor(private sellerService: SellerService) {}
+
+  ngOnInit(): void {
+    this.loadUserData();
+  }
+
+  loadUserData(): void {
+    this.sellerService.getDashboardData().subscribe({
+      next: dashboard => {
+        console.log('Navbar Dashboard data:', dashboard);
+        this.user = dashboard;
+         this.sellerId = dashboard.sellerId; // ✅ CORRECT FIELD
+      },
+      error: err => console.error('Failed to load dashboard data', err)
+    });
+  }
+
+  toggleUserMenu() {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  logout() {
+    window.location.href = '/';
+  }
+  // Helper to get initials
+get userInitials(): string {
+  if (!this.user?.name) return 'S'; // fallback
+  const names = this.user.name.split(' ');
+  if (names.length === 1) return names[0].charAt(0).toUpperCase();
+  return (names[0].charAt(0) + names[1].charAt(0)).toUpperCase();
+}
+
+ private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
+  }
+}

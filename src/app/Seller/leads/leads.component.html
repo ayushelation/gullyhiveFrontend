@@ -1,0 +1,44 @@
+<!-- PAGE CONTENT -->
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+  <h1 class="text-3xl font-bold mb-6">Leads</h1>
+
+  <!-- FILTERS -->
+  <div class="flex gap-3 mb-6">
+    <button
+      *ngFor="let s of ['all','new','responded','viewed']"
+      (click)="setFilter(s)"
+      class="px-4 py-2 rounded-lg font-medium"
+      [ngClass]="filterStatus === s ? 'bg-orange-600 text-white' : 'bg-gray-100'"
+    >
+      {{ s | titlecase }}
+    </button>
+  </div>
+
+  <!-- LEADS LIST -->
+  <div class="space-y-4">
+    <div *ngFor="let lead of filteredLeads"
+      class="bg-white border rounded-lg p-6 hover:shadow-lg transition">
+
+      <div class="flex justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">{{ lead.serviceName }}</h3>
+          <p class="text-orange-600 font-medium">{{ lead.status }}</p>
+          <p class="text-gray-600 text-sm mt-2">{{ lead.description }}</p>
+
+           <div class="flex gap-4 text-sm text-gray-500 mt-3">
+            <span><i class="ri-map-pin-line"></i> {{ lead.location }}</span>
+            <span><i class="ri-time-line"></i>  {{ lead.createdAt | date:'dd MMM yyyy, hh:mm a' }}</span>
+            <span><i class="ri-money-dollar-circle-line"></i> {{ lead.budgetMin }}</span>
+          </div> 
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <button class="px-4 py-2 bg-orange-600 text-white rounded-lg">Send Quote</button>
+          <button class="px-4 py-2 border rounded-lg">View Details</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
