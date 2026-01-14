@@ -1,7 +1,14 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+// import { Component, Input, Output, EventEmitter } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { AuthService } from '../auth.service';
+// import { PLATFORM_ID, Inject } from '@angular/core';
+// import { isPlatformBrowser } from '@angular/common';
+import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-//import { ErrorMessageComponent } from '../error-message-display/error-message-display.component'
+import { PLATFORM_ID } from '@angular/core';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-step1-basic-info',
@@ -12,70 +19,78 @@ import { FormsModule } from '@angular/forms';
 export class Step1BasicInfoComponent {
   @Input() formData: any;
   @Input() errors: any;
-  @Output() inputChange = new EventEmitter<{field: string, value: any}>();
+  @Output() inputChange = new EventEmitter<{ field: string, value: any }>();
   @Output() next = new EventEmitter<void>();
   @Output() sendOTP = new EventEmitter<void>();
-  
 
   profilePreview: string = '';
   fileInputId = 'profile-upload-' + Math.random().toString(36).substring(2);
 
-  serviceCategories = [
-    'Home Cleaning & Housekeeping',
-    'Repairs & Maintenance',
-    'Appliance Repair & Service',
-    'Painting & Home Improvement',
-    'Pest Control',
-    'Packers & Movers',
-    'Beauty & Grooming at Home',
-    'Home Health & Elderly Care',
-    'Interior & Renovation',
-    'Home Security & Smart Devices',
-    'Vehicle Services',
-    'Professional Services'
+  parentCategories: any[] = [];
+  subCategories: any[] = [];
+
+  professionalTypes = [
+    { label: 'Independent Professional', value: 'individual' },
+    { label: 'MSME / Agency', value: 'msme' },
+    { label: 'Company / Corporate', value: 'company' }
   ];
 
-  // professionalTypes = [
-  //   'Independent Professional',
-  //   'Agency',
-  //   'Corporate',
-  //   'Freelancer'
-  // ];
-  professionalTypes = [
-  { label: 'Independent Professional', value: 'individual' },
-  { label: 'MSME / Agency', value: 'msme' },
-  { label: 'Company / Corporate', value: 'company' }
-];
+  constructor(private authService: AuthService,  @Inject(PLATFORM_ID) private platformId: Object) {}
 
-
-
-  ngOnChanges(): void {
-    if (this.formData?.profilePicture && this.formData.profilePicture instanceof File) {
-      this.generatePreview(this.formData.profilePicture);
-    } else if (!this.formData?.profilePicture) {
-      this.profilePreview = '';
-    }
+  // ngOnInit() {
+  //   // Fetch parent categories
+  //   this.authService.getParentCategories().subscribe({
+  //     next: (res) => this.parentCategories = res,
+  //     error: (err) => console.error('Error fetching parent categories:', err)
+  //   });
+  // }
+  ngOnInit() {
+  if (isPlatformBrowser(this.platformId)) {  
+    this.authService.getParentCategories().subscribe(res => {
+      this.parentCategories = res;
+    });
   }
+}
 
-  onServiceCategoryChange(category: string): void {
-    const currentCategories = [...(this.formData?.serviceCategory || [])];
-    const index = currentCategories.indexOf(category);
-    
-    if (index === -1) {
-      currentCategories.push(category);
+  onCategoryChange(categoryId: string) {
+  if (!categoryId) return;
+
+  const id = Number(categoryId);
+
+  this.formData.serviceCategoryId = id;
+  this.inputChange.emit({ field: 'serviceCategoryId', value: id });
+
+  this.formData.subCategoryIds = [];
+  this.subCategories = [];
+
+  this.authService.getSubCategories(id).subscribe(res => {
+    this.subCategories = res;
+  });
+}
+
+
+  toggleSubCategory(subId: number) {
+    if (!this.formData.subCategoryIds) {
+      this.formData.subCategoryIds = [];
+    }
+
+    const index = this.formData.subCategoryIds.indexOf(subId);
+
+    if (index > -1) {
+      this.formData.subCategoryIds.splice(index, 1);
     } else {
-      currentCategories.splice(index, 1);
+      this.formData.subCategoryIds.push(subId);
     }
-    
-    this.inputChange.emit({ field: 'serviceCategory', value: currentCategories });
+
+    // Emit changes
+    this.inputChange.emit({ field: 'subCategoryIds', value: this.formData.subCategoryIds });
   }
 
-  onProfilePictureChange(event: Event): void {
+  // Profile picture & input helpers
+  onProfilePictureChange(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      if (!file.type.startsWith('image/')) { alert('Please upload an image file'); return; }
-      if (file.size > 5 * 1024 * 1024) { alert('Max 5MB'); return; }
       this.generatePreview(file);
       this.inputChange.emit({ field: 'profilePicture', value: file });
     } else {
@@ -83,87 +98,24 @@ export class Step1BasicInfoComponent {
     }
   }
 
-  removeProfilePicture(): void {
+  removeProfilePicture() {
     this.profilePreview = '';
     this.inputChange.emit({ field: 'profilePicture', value: null });
     const fileInput = document.getElementById(this.fileInputId) as HTMLInputElement;
     if (fileInput) fileInput.value = '';
   }
 
-  private generatePreview(file: File): void {
+  private generatePreview(file: File) {
     const reader = new FileReader();
     reader.onloadend = () => this.profilePreview = reader.result as string;
     reader.readAsDataURL(file);
   }
 
-  onInputFieldChange(field: string, value: string): void {
+  onInputFieldChange(field: string, value: any) {
     this.inputChange.emit({ field, value });
-
-
- // Remove error for this field while typing
-     if (this.errors[field]) {
-      delete this.errors[field];
-    }
+    if (this.errors[field]) delete this.errors[field];
   }
 
- onSendOTP() {
-    // if (!this.formData.mobile || this.formData.mobile.length !== 10) {
-    //   alert('Enter valid mobile number');
-    //   return;
-    // }
-    this.sendOTP.emit();
-  }
-
-
-
- /** Validate form fields */
-  // validateForm(): boolean {
-  //   this.errors = {}; // reset previous errors
-
-  //   if (!this.formData.fullName?.trim()) {
-  //     this.errors.fullName = 'Full Name is required';
-  //   }
-
-  //   if (!this.formData.email?.trim()) {
-  //     this.errors.email = 'Email is required';
-  //   } else if (!/^\S+@\S+\.\S+$/.test(this.formData.email)) {
-  //     this.errors.email = 'Enter a valid email';
-  //   }
-
-  //   if (!this.formData.mobile?.trim()) {
-  //     this.errors.mobile = 'Mobile number is required';
-  //   } else if (!/^\d{10}$/.test(this.formData.mobile)) {
-  //     this.errors.mobile = 'Enter a valid 10-digit mobile number';
-  //   }
-
-  //   if (!this.formData.serviceCategory?.length) {
-  //     this.errors.serviceCategory = 'Select at least one service category';
-  //   }
-
-  //   if (!this.formData.coverageArea?.trim()) {
-  //     this.errors.coverageArea = 'Coverage area is required';
-  //   }
-
-  //   if (!this.formData.professionalType?.trim()) {
-  //     this.errors.professionalType = 'Select a professional type';
-  //   }
-
-  //   // Return true if no errors
-  //   return Object.keys(this.errors).length === 0;
-  // }
-
-  // onNextClick(): void {
-  //   if (this.validateForm()) {
-  //     this.next.emit();
-  //   } else {
-  //     console.log('Form validation failed', this.errors);
-  //   }
-  // }
-
-
-  onNextClick(): void {
-    this.next.emit();
-  }
-  
-
+  onSendOTP() { this.sendOTP.emit(); }
+  onNextClick() { this.next.emit(); }
 }

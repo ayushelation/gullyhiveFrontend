@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+// import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.prod';
 @Injectable({ providedIn: 'root' })
 
 
@@ -104,5 +105,18 @@ submitRegistration(formData: FormData) {
   isLoggedIn() {
     return !!localStorage.getItem('token');
   }
+  // Service Categories APIs
+getParentCategories(): Observable<any[]> {
+  return this.http.get<any[]>(
+     `${this.apiUrl}/parents`,
+  );
+}
+ //`${environment.apiBaseUrl}/parents`
+getSubCategories(parentId: number): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.apiUrl}/${parentId}/children`
+  );
+}
+
 }
 
