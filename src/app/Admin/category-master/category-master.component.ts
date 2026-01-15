@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AdminService } from '../admin.service';
-import { environment } from '../../../environments/environment';
+// import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prod';
 
 interface ServiceCategory {
   id: number;
