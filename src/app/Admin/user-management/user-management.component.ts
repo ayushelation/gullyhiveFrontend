@@ -4,10 +4,10 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
-import { SidebarComponent } from '../sidebar/sidebar.component';
 import { FooterComponent } from '../footer/footer.component';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { AdminModule } from "../admin.module";
 
 interface User {
   userId: number;
@@ -17,17 +17,16 @@ interface User {
 
 @Component({
   selector: 'app-user-management',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    HttpClientModule,
-    HeaderComponent,
-    SidebarComponent,
-    FooterComponent
-  ],
+  // standalone: true,
+  // imports: [
+  //   CommonModule,
+  //   RouterModule,
+  //   HttpClientModule,
+  //   HeaderComponent,
+  //   FooterComponent
+  // ],
   templateUrl: './user-management.component.html',
-  styleUrls: ['./user-management.component.css']
+  styleUrls: ['./user-management.component.css'],
 })
 export class UserManagementComponent implements OnInit {
   users: User[] = [];

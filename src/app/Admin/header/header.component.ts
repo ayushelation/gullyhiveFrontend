@@ -1,23 +1,58 @@
-// admin/header/header.component.ts
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-header',
   templateUrl: './header.component.html',
-  standalone: true,
-  imports: [CommonModule, RouterModule]
+  styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  isProfileMenuOpen = false;
-  user = {
-    name: 'John Admin',
-    role: 'Administrator',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-  };
+  showDropdown: boolean = false;
+  adminName: string = 'Admin User';
 
-  toggleProfileMenu() {
-    this.isProfileMenuOpen = !this.isProfileMenuOpen;
+  constructor(private router: Router) {}
+
+  toggleDropdown(): void {
+    this.showDropdown = !this.showDropdown;
+  }
+
+  closeDropdown(): void {
+    this.showDropdown = false;
+  }
+
+  goToDashboard(): void {
+    this.closeDropdown();
+    this.router.navigate(['/admin/dashboard']);
+  }
+
+  goToProfile(): void {
+    this.closeDropdown();
+    // Navigate to profile page when created
+    // this.router.navigate(['/admin/profile']);
+    alert('Profile page coming soon!');
+  }
+
+  goToSettings(): void {
+    this.closeDropdown();
+    // Navigate to settings page when created
+    // this.router.navigate(['/admin/settings']);
+    alert('Settings page coming soon!');
+  }
+
+  logout(): void {
+    // Remove token from localStorage
+    localStorage.removeItem('token');
+    // localStorage.removeItem('userData');
+    
+    // Clear any other authentication related data
+    sessionStorage.clear();
+    
+    this.closeDropdown();
+    
+    // Redirect to login page or home page
+    this.router.navigate(['/']);
+    
+    // Optional: Reload the page to clear any state
+    window.location.reload();
   }
 }
