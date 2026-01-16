@@ -151,7 +151,8 @@ export class RegisterComponent {
     formData.append('SelfOverview', this.formData.selfOverview || '');
     formData.append('SkillsBackground', this.formData.skillsBackground || '');
     formData.append('Achievements', this.formData.achievements || '');
-    if (this.formData.profilePicture) formData.append('ProfilePicture', this.formData.profilePicture);
+   if (this.formData.profilePicture) 
+    formData.append('ProfilePicture', this.formData.profilePicture);
 
     this.service.submitRegistration(formData).subscribe({
       next: res => {
