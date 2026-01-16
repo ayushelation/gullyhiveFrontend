@@ -38,29 +38,19 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 
 import { HeaderComponent } from '../header/header.component';
-import { SidebarComponent } from '../sidebar/sidebar.component';
 import { FooterComponent } from '../footer/footer.component';
-import { StatsCardsComponent } from '../stats-cards/stats-cards.component';
-import { RecentLeadsComponent } from '../recent-leads/recent-leads.component';
-import { LeadChartComponent } from '../lead-chart/lead-chart.component';
-import { QuickActionsComponent } from '../quick-actions/quick-actions.component';
 
 import { AdminService } from '../admin.service';
 
 @Component({
   selector: 'app-admin-dashboard',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    HeaderComponent,
-    SidebarComponent,
-    FooterComponent,
-    StatsCardsComponent,
-    RecentLeadsComponent,
-    LeadChartComponent,
-    QuickActionsComponent
-  ],
+  // standalone: true,
+  // imports: [
+  //   CommonModule,
+  //   RouterModule,
+  //   HeaderComponent,
+  //   FooterComponent,
+  // ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -90,7 +80,7 @@ export class DashboardComponent implements OnInit {
 
         if (err.status === 401 || err.status === 403) {
           // Token invalid OR role not Admin
-          this.router.navigate(['/login']);
+          this.router.navigate(['/']);
         } else {
           this.error = 'Failed to load dashboard';
         }
