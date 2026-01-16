@@ -1,200 +1,174 @@
-<!-- <div class="min-h-screen bg-gray-50">
+<div *ngIf="!loading && profile" class="min-h-screen bg-gray-50">
 
+  <!-- Profile Header -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="bg-white rounded-lg border border-gray-200 p-8 mb-8">
-      <div class="flex items-start justify-between mb-6">
-        <div class="flex items-start space-x-6">
-          <div class="w-24 h-24 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-4xl font-semibold">
-            JD
-          </div>
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">John Doe</h1>
-            <p class="text-gray-600 mb-3">Professional Cleaning Services</p>
-            <div class="flex items-center space-x-4 mb-4">
-              <div class="flex items-center">
-                <i class="ri-star-fill text-yellow-400 mr-1"></i>
-                <span class="font-semibold text-gray-900">4.9</span>
-                <span class="text-gray-500 ml-1">(127 reviews)</span>
-              </div>
-              <div class="flex items-center text-gray-600">
-                <i class="ri-map-pin-line mr-1"></i>
-                New York, NY
-              </div>
-            </div>
-          </div>
-        </div>
-        <a routerLink="/seller/settings/profile" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
-          <i class="ri-edit-line mr-2"></i>
-          Edit Profile
-        </a>
-      </div>
-    </div> -->
-
-    <!-- Services -->
-    <!-- <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
-      <h2 class="text-xl font-bold text-gray-900 mb-4">Services Offered</h2>
-      <div class="space-y-2">
-        <div *ngFor="let service of services" class="flex items-center text-gray-700">
-          <i class="ri-checkbox-circle-fill text-green-600 mr-2"></i>
-          {{ service }}
-        </div>
-      </div>
-    </div> -->
-
-    <!-- Portfolio -->
-    <!-- <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
-      <h2 class="text-xl font-bold text-gray-900 mb-4">Portfolio</h2>
-      <div class="grid grid-cols-2 gap-4">
-        <div *ngFor="let image of portfolio" class="relative aspect-video rounded-lg overflow-hidden group cursor-pointer">
-          <img [src]="image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-        </div>
-      </div>
-    </div> -->
-
-    <!-- Reviews -->
-    <!-- <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
-      <h2 class="text-xl font-bold text-gray-900 mb-4">Reviews</h2>
-      <div class="space-y-6">
-        <div *ngFor="let review of reviews" class="border-b border-gray-200 last:border-0 pb-6 last:pb-0">
-          <div class="flex items-start space-x-4">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
-              {{ review.avatar }}
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="font-semibold text-gray-900">{{ review.name }}</h3>
-                <span class="text-sm text-gray-500">{{ review.date }}</span>
-              </div>
-              <div class="flex items-center mb-2">
-                <i *ngFor="let star of getStars(review.rating); let i = index" class="ri-star-fill" [ngClass]="star ? 'text-yellow-400' : 'text-gray-300'"></i>
-              </div>
-              <p class="text-gray-700">{{ review.comment }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> -->
-
-
-
-
-
-
-
-<!-- <p *ngIf="profile.addressLine1">
-  <i class="ri-map-pin-line mr-1"></i>
-  {{ profile.addressLine1 }},
-  {{ profile.locality }},
-  {{ profile.addressCity }},
-  {{ profile.state }} - {{ profile.pincode }}
-</p>
-<p>Total Jobs: {{ profile.totalJobsCompleted }}</p>
-<p>Dispute Rate: {{ profile.disputeRate }}%</p> -->
-
-<div class="min-h-screen bg-gray-50">
-
-  <!-- Loading -->
-  <div *ngIf="loading" class="flex justify-center items-center h-96">
-    <i class="ri-loader-4-line animate-spin text-4xl text-orange-500"></i>
-  </div>
-
-  <!-- Error -->
-  <div *ngIf="!loading && errorMessage" class="text-center text-red-500 mt-20">
-    {{ errorMessage }}
-  </div>
-
-  <!-- Profile -->
-  <div *ngIf="!loading && profile" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-    <!-- PROFILE HEADER -->
     <div class="bg-white rounded-lg border p-8 mb-8">
       <div class="flex items-start justify-between">
 
-        <div class="flex gap-6">
-          <div class="w-24 h-24 rounded-full bg-gradient-to-br from-orange-400 to-orange-600
-                      flex items-center justify-center text-white text-4xl font-semibold">
-            {{ getInitials(profile.displayName) }}
+        <div class="flex space-x-6">
+          <!-- Avatar -->
+          <div class="w-24 h-24 rounded-full bg-orange-500 text-white text-4xl flex items-center justify-center">
+            <!-- {{ getInitials(profile.displayName || profile.legalName) }} -->
+                     <img
+  *ngIf="profile.profilePictureUrl; else initialsAvatar"
+  [src]="profile.profilePictureUrl"
+  class="w-24 h-24 rounded-full object-cover"
+/>
+
+<ng-template #initialsAvatar>
+  <div class="w-24 h-24 rounded-full bg-orange-500 text-white text-4xl flex items-center justify-center">
+    {{ getInitials(profile.displayName || profile.legalName) }}
+  </div>
+</ng-template>
           </div>
 
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">{{ profile.displayName }}</h1>
-            <p class="text-gray-600 mt-1">({{ profile.legalName }})</p>
-            <p class="text-gray-600 mt-1">{{ profile.providerType }} - {{ profile.status }}</p>
-            <div class="flex items-center mt-2">
-              <i class="ri-star-fill text-yellow-400 mr-1"></i>
-              <span class="font-semibold">{{ profile.avgRating }}</span>
-              <span class="text-gray-500 ml-1">({{ profile.ratingCount }} reviews)</span>
+            <h1 class="text-3xl font-bold text-gray-900">
+              {{ profile.displayName || profile.legalName }}
+            </h1>
+
+            <p class="text-gray-600">
+              {{ profile.providerType }}
+            </p>
+
+            <div class="flex items-center space-x-4 mt-3">
+              <!-- Rating -->
+              <div class="flex items-center">
+                <i
+                  *ngFor="let filled of getStars(profile.avgRating)"
+                  class="ri-star-fill"
+                  [class.text-yellow-400]="filled"
+                  [class.text-gray-300]="!filled">
+                </i>
+
+                <span class="ml-2 font-semibold">
+                  {{ profile.avgRating || '0.0' }}
+                </span>
+              <span class="text-gray-500 ml-1">
+                  ({{ profile.ratingCount || 0 }} reviews)
+              </span>
+              </div>
+
+              <!-- Location -->
+              <div class="flex items-center text-gray-600">
+                <i class="ri-map-pin-line mr-1"></i>
+                {{ profile.baseCity }}, {{ profile.state }}
+              </div>
             </div>
-            <p class="text-gray-600 mt-1"><i class="ri-map-pin-line mr-1"></i>{{ profile.baseCity }} {{ profile.state }} - {{ profile.pincode }}</p>
-            <p class="text-gray-600 mt-1"><i class="ri-mail-line mr-1"></i>{{ profile.email }}</p>
-            <p class="text-gray-600 mt-1"><i class="ri-phone-line mr-1"></i>{{ profile.phone }}</p>
+
+            <!-- Badges -->
+            <div class="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+              <span class="flex items-center">
+                <i class="ri-checkbox-circle-fill text-green-600 mr-1"></i>
+                {{ profile.status | titlecase }}
+              </span>
+
+              <span class="flex items-center">
+                <i class="ri-time-line mr-1"></i>
+                Member since {{ profile.createdAt |  date:'mediumDate'  }}
+              </span> 
+            </div>
           </div>
         </div>
-
-        <!-- <a 
-        routerLink]="['/seller/completeProfile', profile.sellerId]" 
-           class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+     <a *ngIf="profile" [routerLink]="['/seller/settings/profile', profile.sellerId]"
+          class="px-4 py-2 border rounded-lg hover:bg-gray-50">
           <i class="ri-edit-line mr-2"></i> Edit Profile
-        </a> -->
-<a *ngIf="profile"
-   [routerLink]="['/seller/settings/profile', profile.sellerId]" 
-   class="px-4 py-2 border rounded-lg hover:bg-gray-50">
-  <i class="ri-edit-line mr-2"></i> Edit Profile
-</a>
+        </a>
 
       </div>
     </div>
 
-    <!-- SERVICES (if you have them) -->
-    <div *ngIf="profile.services?.length" class="bg-white rounded-lg border p-6 mb-8">
-      <h2 class="text-xl font-bold mb-4">Services Offered</h2>
-      <div class="space-y-2">
-        <div *ngFor="let service of profile.services" class="flex items-center">
-          <i class="ri-checkbox-circle-fill text-green-600 mr-2"></i>
-          {{ service }}
+    <!-- Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Left -->
+      <div class="lg:col-span-2 space-y-8">
+
+        <!-- About -->
+        <div class="bg-white border rounded-lg p-6">
+          <h2 class="text-xl font-bold mb-4">About</h2>
+          <p class="text-gray-700 leading-relaxed">
+            {{ profile.description || 'No description provided.' }}
+          </p>
         </div>
-      </div>
-    </div>
 
-    <!-- PORTFOLIO (if you have them) -->
-    <div *ngIf="profile.portfolioImages?.length" class="bg-white rounded-lg border p-6 mb-8">
-      <h2 class="text-xl font-bold mb-4">Portfolio</h2>
-      <div class="grid grid-cols-2 gap-4">
-        <img *ngFor="let img of profile.portfolioImages" [src]="img"
-             class="rounded-lg object-cover aspect-video hover:scale-105 transition" />
-      </div>
-    </div>
+        <!-- Portfolio -->
+        <div *ngIf="profile.portfolioImages?.length" class="bg-white border rounded-lg p-6">
+          <h2 class="text-xl font-bold mb-4">Portfolio</h2>
 
-    <!-- REVIEWS (if you have them) -->
-    <div *ngIf="profile.reviews?.length" class="bg-white rounded-lg border p-6 mb-8">
-      <h2 class="text-xl font-bold mb-4">Reviews</h2>
-      <div *ngFor="let review of profile.reviews" class="border-b pb-6 mb-6 last:border-0">
-        <div class="flex gap-4">
-          <div class="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center font-semibold">
-            {{ review.reviewerName[0] }}
-          </div>
-          <div class="flex-1">
-            <div class="flex justify-between mb-1">
-              <h3 class="font-semibold">{{ review.reviewerName }}</h3>
-              <span class="text-sm text-gray-500">{{ review.createdAt | date:'mediumDate' }}</span>
+          <div class="grid grid-cols-2 gap-4">
+             <img
+              *ngFor="let img of profile.portfolioImages"
+              [src]="img"
+              class="rounded-lg aspect-video object-cover" /> 
+  
             </div>
-            <div class="flex mb-2">
-              <i *ngFor="let star of getStars(review.rating)" 
-                 class="ri-star-fill" 
-                 [ngClass]="star ? 'text-yellow-400' : 'text-gray-300'"></i>
+        </div>
+
+        <!-- Reviews -->
+        <div *ngIf="profile.reviews?.length" class="bg-white border rounded-lg p-6">
+          <h2 class="text-xl font-bold mb-4">Reviews</h2>
+
+          <div *ngFor="let review of profile.reviews" class="border-b pb-4 mb-4 last:border-0">
+            <div class="flex space-x-4">
+              <div class="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center">
+                {{ getInitials(review.reviewerName) }}
+              </div>
+
+              <div>
+                <h3 class="font-semibold">{{ review.reviewerName }}</h3>
+
+                <div class="flex">
+                  <i
+                    *ngFor="let filled of getStars(review.rating)"
+                    class="ri-star-fill"
+                    [class.text-yellow-400]="filled"
+                    [class.text-gray-300]="!filled">
+                  </i>
+                </div>
+
+                <p class="text-gray-700">{{ review.comment }}</p>
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ review.createdAt | date:'mediumDate' }}
+                </p>
+              </div>
             </div>
-            <p class="text-gray-700">{{ review.comment }}</p>
           </div>
         </div>
+
+      </div>
+
+      <!-- Right -->
+      <div class="space-y-8">
+
+        <!-- Services -->
+        <div *ngIf="profile.services?.length" class="bg-white border rounded-lg p-6">
+          <h2 class="text-xl font-bold mb-4">Services Offered</h2>
+
+          <div *ngFor="let service of profile.services" class="flex items-center text-gray-700">
+            <i class="ri-checkbox-circle-fill text-green-600 mr-2"></i>
+            {{ service }}
+          </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="bg-white border rounded-lg p-6">
+          <h2 class="text-xl font-bold mb-4">Contact</h2>
+
+          <div class="space-y-2 text-gray-700">
+            <p *ngIf="profile.phone">
+              <i class="ri-phone-line mr-2"></i> {{ profile.phone }}
+            </p>
+
+            <p *ngIf="profile.email">
+              <i class="ri-mail-line mr-2"></i> {{ profile.email }}
+            </p>
+          </div>
+        </div>
+
       </div>
     </div>
 
   </div>
 </div>
-
-
-
-

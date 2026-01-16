@@ -1,9 +1,4 @@
-// import { Component, Input, Output, EventEmitter } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
-// import { AuthService } from '../auth.service';
-// import { PLATFORM_ID, Inject } from '@angular/core';
-// import { isPlatformBrowser } from '@angular/common';
+
 import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -37,13 +32,6 @@ export class Step1BasicInfoComponent {
 
   constructor(private authService: AuthService,  @Inject(PLATFORM_ID) private platformId: Object) {}
 
-  // ngOnInit() {
-  //   // Fetch parent categories
-  //   this.authService.getParentCategories().subscribe({
-  //     next: (res) => this.parentCategories = res,
-  //     error: (err) => console.error('Error fetching parent categories:', err)
-  //   });
-  // }
   ngOnInit() {
   if (isPlatformBrowser(this.platformId)) {  
     this.authService.getParentCategories().subscribe(res => {
@@ -86,17 +74,46 @@ export class Step1BasicInfoComponent {
     this.inputChange.emit({ field: 'subCategoryIds', value: this.formData.subCategoryIds });
   }
 
-  // Profile picture & input helpers
+  // // Profile picture & input helpers
+  // onProfilePictureChange(event: Event) {
+  //   const input = event.target as HTMLInputElement;
+  //   if (input.files && input.files[0]) {
+  //     const file = input.files[0];
+  //     this.generatePreview(file);
+  //     this.inputChange.emit({ field: 'profilePicture', value: file });
+  //   } else {
+  //     this.removeProfilePicture();
+  //   }
+  // }
   onProfilePictureChange(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      const file = input.files[0];
-      this.generatePreview(file);
-      this.inputChange.emit({ field: 'profilePicture', value: file });
+        const file = input.files[0];
+
+        // --- FILE VALIDATION ---
+        if (file.size > 5 * 1024 * 1024) { // 5MB
+            alert('File size should be less than 5 MB');
+            input.value = ''; // reset input
+            return;
+        }
+        if (!['image/png', 'image/jpeg'].includes(file.type)) {
+            alert('Only PNG or JPG allowed');
+            input.value = ''; // reset input
+            return;
+        }
+
+        // --- PREVIEW ---
+        const reader = new FileReader();
+        reader.onloadend = () => this.profilePreview = reader.result as string;
+        reader.readAsDataURL(file);
+
+        // --- EMIT TO PARENT ---
+        this.inputChange.emit({ field: 'profilePicture', value: file });
     } else {
-      this.removeProfilePicture();
+        this.removeProfilePicture();
     }
-  }
+}
+
 
   removeProfilePicture() {
     this.profilePreview = '';
