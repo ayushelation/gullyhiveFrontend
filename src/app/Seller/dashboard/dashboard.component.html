@@ -9,11 +9,107 @@
 
   <!-- Child Components -->
   <app-profile-completion [user]="user"></app-profile-completion>
-  <app-stats-cards [user]="user"></app-stats-cards>
-  <app-quick-actions [user]="user"></app-quick-actions>
-<!-- <app-quick-actions [userId]="user?.id"></app-quick-actions> -->
+  <!-- <app-stats-cards [user]="user"></app-stats-cards> -->
+   <app-stats-cards
+  [totalLeads]="totalLeads"
+  [totalResponses]="totalResponses"
+  [acceptedResponses]="acceptedResponses"
+  [pendingResponses]="pendingResponses"
+></app-stats-cards>
+
+   <!-- <app-quick-actions [user]="user"></app-quick-actions>  -->
+   <app-quick-actions
+  (editServices)="openEditServices()">
+</app-quick-actions>
+
+
   <app-recent-leads [user]="user"></app-recent-leads>
 </div>
+
+
+
+<!-- EDIT SERVICES MODAL -->
+<!-- EDIT SERVICES & AREA MODAL -->
+<div *ngIf="showServicesModal"
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+  <div class="bg-white w-full max-w-2xl rounded-xl p-6 overflow-y-auto max-h-[90vh]">
+
+    <!-- Header -->
+    <h2 class="text-xl font-bold mb-6">Edit Services & Service Area</h2>
+
+    <!-- ================= SERVICES ================= -->
+
+
+<div *ngIf="showServicesModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white w-full max-w-2xl p-6 rounded-lg overflow-y-auto max-h-[90vh]">
+
+    <h2 class="text-xl font-bold mb-4">Edit Services & Area</h2>
+
+    <!-- Services -->
+    <div class="mb-4">
+      <div *ngFor="let s of services; let i = index">
+       <span>{{ getCategoryName(s.categoryId) }} - 
+     {{ getSubCategoryNames(s) }}
+</span>
+
+        <button (click)="removeService(i)">Remove</button>
+      </div>
+    </div>
+
+    <!-- Add Service -->
+    <select [(ngModel)]="selectedCategory" (change)="onCategoryChange(selectedCategory!)">
+      <option value="">Select Category</option>
+      <option *ngFor="let cat of parentCategories" [value]="cat.id">{{ cat.name }}</option>
+    </select>
+
+    <div *ngIf="subCategories.length > 0">
+      <label *ngFor="let sub of subCategories">
+        <input type="checkbox"
+               [checked]="isSubCategorySelected(selectedCategory, sub.id)"
+
+               (change)="toggleSubCategory(sub.id)" />
+        {{ sub.name }}
+      </label>
+    </div>
+
+    <button (click)="addService()">Add Service</button>
+
+    <!-- Service Area -->
+    <select [(ngModel)]="serviceArea.type">
+      <option value="">Select Area Type</option>
+      <option value="city">City</option>
+      <option value="radius">Radius</option>
+      <option value="pincode">Pincode</option>
+    </select>
+
+    <div *ngIf="serviceArea.type === 'city'">
+      <select [(ngModel)]="serviceArea.cityId">
+        <option *ngFor="let city of cities" [value]="city.id">{{ city.name }}</option>
+      </select>
+    </div>
+
+    <div *ngIf="serviceArea.type === 'radius'">
+      <input type="number" [(ngModel)]="serviceArea.radiusKm" placeholder="Radius in KM">
+    </div>
+
+    <div *ngIf="serviceArea.type === 'pincode'">
+      <input [(ngModel)]="pincodeInput" placeholder="Enter pincode">
+      <button (click)="addPincode()">Add</button>
+      <span *ngFor="let p of serviceArea.pincodes; let i = index">
+        {{ p }} <button (click)="removePincode(i)">x</button>
+      </span>
+    </div>
+<button (click)="closeServicesModal()">Cancel</button>
+
+    <button (click)="saveServicesAndArea()">Save Changes</button>
+  </div>
+</div>
+
+
+
+
+
 
 
 

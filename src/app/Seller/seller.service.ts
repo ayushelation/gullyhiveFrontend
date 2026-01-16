@@ -3,8 +3,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map,BehaviorSubject  } from 'rxjs';
-// import { environment } from '../../environments/environment';
-import { environment } from '../../environments/environment.prod';
+ import { environment } from '../../environments/environment';
+//import { environment } from '../../environments/environment.prod';
 
 // --- Dashboard & Stats ---
 export interface SellerStats {
@@ -39,20 +39,10 @@ export interface DashboardData {
   email: string;
   stats: SellerStats;
   recentLeads: Lead[];
+   profilePictureUrl?: string; // ← add this
 }
 
-// export interface PublicProfile {
-//   sellerId: number;
-//   legalName: string;
-//   displayName: string;
-//   email: string;
-//   phone: string;
-//   providerType: string;
-//   status: string;
-//   baseCity: string;
-//   avgRating: number;
-//   ratingCount: number;
-// }
+
 export interface PublicProfile {
   sellerId: number;
   legalName: string;
@@ -62,7 +52,7 @@ export interface PublicProfile {
   providerType: string;
   status: string;
   baseCity: string;
-
+  profilePictureUrl?: string;
  // Ratings & stats
   avgRating: number;
   ratingCount: number;
@@ -80,7 +70,7 @@ export interface PublicProfile {
   state?: string;
   pincode?: string;
   description?: string;
-
+  createdAt: string;
   // optional
   services?: string[];
   portfolioImages?: string[];
@@ -138,17 +128,24 @@ export interface Referral {
   amount?: number;   // numeric for totals
 }
 
+// ────────────── MODELS ──────────────
 
-// export interface PartnerEarning {
-//   id: number;
-//   partner_user_id: number;
-//   referral_id: number;
-//   rule_id: number;
-//   earning_type: string;
-//   amount: number;
-//   status: string;
-//   created_at: string;
-// }
+export interface ProviderService {
+  categoryId: number;
+  subCategoryIds: number[];
+}
+
+export interface ProviderServicesResponse {
+  services: ProviderService[];
+  serviceArea: {
+    type: 'city' | 'radius' | 'pincode';
+    cityId?: number;
+    radiusKm?: number;
+    pincodes: string[];
+  };
+}
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -182,6 +179,11 @@ export class SellerService {
         map(res => {
           // Save sellerId globally
           this.sellerIdSubject.next(res.data.sellerId);
+           // Prepend base URL to profile picture if it exists
+        if (res.data.profilePictureUrl) {
+          res.data.profilePictureUrl = environment.assetUrl + res.data.profilePictureUrl;
+        }
+
           return res.data;
         })
       );
@@ -199,20 +201,47 @@ export class SellerService {
   }
 
 
+// getPublicProfile(sellerId: number) {
+//   return this.http.get<{ success: boolean; data: PublicProfile }>(
+//       `${this.apiUrl}/completeProfile/${sellerId}`,
+//       { headers: this.getHeaders() }
+//     )
+//     .pipe(map(res => res.data));
+// }
+
+
+
 getPublicProfile(sellerId: number) {
-  return this.http.get<{ success: boolean; data: PublicProfile }>(
+  return this.http
+    .get<{ success: boolean; data: PublicProfile }>(
       `${this.apiUrl}/completeProfile/${sellerId}`,
       { headers: this.getHeaders() }
     )
-    .pipe(map(res => res.data));
+    .pipe(
+      map(res => {
+        const profile = res.data;
+
+        if (profile.profilePictureUrl) {
+          profile.profilePictureUrl = environment.assetUrl  + profile.profilePictureUrl;
+        }
+
+        return profile;
+      })
+    );
 }
 
-updateProfile(sellerId: number, payload: any) {
-  return this.http.put(
-    `${this.apiUrl}/editprofile/${sellerId}`,
-    payload
-  );
+// updateProfile(sellerId: number, payload: any) {
+//   return this.http.put(
+//     `${this.apiUrl}/editprofile/${sellerId}`,
+//     payload
+//   );
+// }
+updateProfile(sellerId: number, payload: FormData) {
+  return this.http.post(`${this.apiUrl}/updateProfile/${sellerId}`, payload, {
+    headers: this.getHeaders() // Do NOT set Content-Type; browser handles multipart
+  });
 }
+
 
    // Pass sellerId here
  getMyResponses(sellerId: number): Observable<{ success: boolean, data: Response[] }> {
@@ -247,6 +276,44 @@ getReferrals(sellerId: number): Observable<Referral[]> {
   ).pipe(map(res => res.data));
 }
 
+  // Service Categories APIs
+getParentCategories(): Observable<any[]> {
+  return this.http.get<any[]>(
+     `${this.apiUrl}/parents`,
+  );
+}
+ //`${environment.apiBaseUrl}/parents`
+getSubCategories(parentId: number): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.apiUrl}/${parentId}/children`
+  );
+}
+
+ // 🔹 Get cities
+  getCities(): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrl}/cities`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // 🔹 Get provider services (existing categories + subcategories + service area)
+// 🔹 Get provider services (existing categories + subcategories + service area)
+getProviderServices(providerId: number): Observable<ProviderServicesResponse> {
+  return this.http.get<ProviderServicesResponse>(
+    `${this.apiUrl}/services/${providerId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+  // 🔹 Update services + area
+  updateServicesAndArea(providerId: number, payload: any) {
+    return this.http.post(
+      `${this.apiUrl}/update-services`,
+      payload,
+      { headers: this.getHeaders() }
+    );
+  }
 
 
 }

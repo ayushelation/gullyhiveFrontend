@@ -56,6 +56,7 @@ export class SellerLayoutComponent implements OnInit {
     this.loadUserData();
   }
 
+  
   loadUserData(): void {
     this.sellerService.getDashboardData().subscribe({
       next: dashboard => {
