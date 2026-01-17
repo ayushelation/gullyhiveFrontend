@@ -23,7 +23,10 @@
         {{ action.description }}
       </p>
     </a> -->
-  <a
+
+
+    
+  <!-- <a
   *ngFor="let action of actions"
   class="cursor-pointer bg-white rounded-lg p-6 border hover:shadow-lg"
   (click)="onAction(action)"
@@ -35,7 +38,22 @@
   </div>
 
   <h3 class="font-semibold">{{ action.title }}</h3>
-</a>
+</a> -->
+
+<button
+  *ngFor="let action of actions"
+  type="button"
+  class="cursor-pointer bg-white rounded-lg p-6 border hover:shadow-lg text-left"
+  (click)="onAction(action)"
+>
+  <div [ngClass]="action.color"
+       class="w-12 h-12 flex items-center justify-center rounded-lg mb-4">
+    <i [class]="action.icon + ' text-2xl'"></i>
+  </div>
+
+  <h3 class="font-semibold">{{ action.title }}</h3>
+</button>
+
 
   </div>
 </div>

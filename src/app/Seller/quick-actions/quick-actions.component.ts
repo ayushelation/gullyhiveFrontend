@@ -47,6 +47,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 })
 export class QuickActionsComponent {
   @Output() editServices = new EventEmitter<void>();
+  @Input() sellerId!: number;
 
   actions = [
     {
@@ -63,9 +64,16 @@ export class QuickActionsComponent {
     }
   ];
 
+// onAction(action: any) {
+//   if (action.action === 'editServices') {
+//     this.editServices.emit(); // triggers DashboardComponent.openEditServices()
+//   }
+// }
 onAction(action: any) {
   if (action.action === 'editServices') {
-    this.editServices.emit(); // triggers DashboardComponent.openEditServices()
+    this.editServices.emit();
+  } else if (action.link) {
+    // optional: handle navigation here
   }
 }
 

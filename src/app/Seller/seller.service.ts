@@ -3,8 +3,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map,BehaviorSubject  } from 'rxjs';
- import { environment } from '../../environments/environment';
-//import { environment } from '../../environments/environment.prod';
+ //import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.prod';
 
 // --- Dashboard & Stats ---
 export interface SellerStats {
@@ -136,14 +136,18 @@ export interface ProviderService {
 }
 
 export interface ProviderServicesResponse {
-  services: ProviderService[];
+  providerServices: ProviderService[];
   serviceArea: {
     type: 'city' | 'radius' | 'pincode';
     cityId?: number;
     radiusKm?: number;
     pincodes: string[];
   };
+  categories: any[];
+  subCategories: any[];
+  cities: any[];
 }
+
 
 
 
@@ -230,12 +234,6 @@ getPublicProfile(sellerId: number) {
     );
 }
 
-// updateProfile(sellerId: number, payload: any) {
-//   return this.http.put(
-//     `${this.apiUrl}/editprofile/${sellerId}`,
-//     payload
-//   );
-// }
 updateProfile(sellerId: number, payload: FormData) {
   return this.http.post(`${this.apiUrl}/updateProfile/${sellerId}`, payload, {
     headers: this.getHeaders() // Do NOT set Content-Type; browser handles multipart
@@ -279,13 +277,13 @@ getReferrals(sellerId: number): Observable<Referral[]> {
   // Service Categories APIs
 getParentCategories(): Observable<any[]> {
   return this.http.get<any[]>(
-     `${this.apiUrl}/parents`,
+     `${environment.apiBaseUrl}/auth/parents`,
   );
 }
  //`${environment.apiBaseUrl}/parents`
 getSubCategories(parentId: number): Observable<any[]> {
   return this.http.get<any[]>(
-    `${this.apiUrl}/${parentId}/children`
+    `${environment.apiBaseUrl}/auth/${parentId}/children/`
   );
 }
 
@@ -297,19 +295,20 @@ getSubCategories(parentId: number): Observable<any[]> {
     );
   }
 
-  // 🔹 Get provider services (existing categories + subcategories + service area)
-// 🔹 Get provider services (existing categories + subcategories + service area)
 getProviderServices(providerId: number): Observable<ProviderServicesResponse> {
-  return this.http.get<ProviderServicesResponse>(
-    `${this.apiUrl}/services/${providerId}`,
-    { headers: this.getHeaders() }
-  );
+  return this.http
+    .get<{ success: boolean; data: ProviderServicesResponse }>(
+      `${this.apiUrl}/services/${providerId}`,
+      { headers: this.getHeaders() }
+    )
+    .pipe(map(res => res.data));
 }
+
 
   // 🔹 Update services + area
   updateServicesAndArea(providerId: number, payload: any) {
     return this.http.post(
-      `${this.apiUrl}/update-services`,
+      `${this.apiUrl}/update-services/${providerId}`,
       payload,
       { headers: this.getHeaders() }
     );

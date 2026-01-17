@@ -18,7 +18,8 @@
 ></app-stats-cards>
 
    <!-- <app-quick-actions [user]="user"></app-quick-actions>  -->
-   <app-quick-actions
+<app-quick-actions
+  [sellerId]="sellerId"
   (editServices)="openEditServices()">
 </app-quick-actions>
 
@@ -28,54 +29,41 @@
 
 
 
-<!-- EDIT SERVICES MODAL -->
 <!-- EDIT SERVICES & AREA MODAL -->
-<div *ngIf="showServicesModal"
-     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 
-  <div class="bg-white w-full max-w-2xl rounded-xl p-6 overflow-y-auto max-h-[90vh]">
-
-    <!-- Header -->
-    <h2 class="text-xl font-bold mb-6">Edit Services & Service Area</h2>
-
-    <!-- ================= SERVICES ================= -->
-
-
-<div *ngIf="showServicesModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+<!-- <div *ngIf="showServicesModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-white w-full max-w-2xl p-6 rounded-lg overflow-y-auto max-h-[90vh]">
 
     <h2 class="text-xl font-bold mb-4">Edit Services & Area</h2>
 
-    <!-- Services -->
     <div class="mb-4">
       <div *ngFor="let s of services; let i = index">
        <span>{{ getCategoryName(s.categoryId) }} - 
      {{ getSubCategoryNames(s) }}
-</span>
+    </span>
 
         <button (click)="removeService(i)">Remove</button>
       </div>
     </div>
 
-    <!-- Add Service -->
-    <select [(ngModel)]="selectedCategory" (change)="onCategoryChange(selectedCategory!)">
-      <option value="">Select Category</option>
-      <option *ngFor="let cat of parentCategories" [value]="cat.id">{{ cat.name }}</option>
-    </select>
 
-    <div *ngIf="subCategories.length > 0">
-      <label *ngFor="let sub of subCategories">
-        <input type="checkbox"
-               [checked]="isSubCategorySelected(selectedCategory, sub.id)"
+<select [(ngModel)]="editCategoryId" (change)="onCategoryChange(editCategoryId!)">
+  <option value="">Select Category</option>
+  <option *ngFor="let cat of parentCategories" [value]="cat.id">{{ cat.name }}</option>
+</select>
 
-               (change)="toggleSubCategory(sub.id)" />
-        {{ sub.name }}
-      </label>
-    </div>
+<div *ngIf="subCategories.length > 0">
+  <label *ngFor="let sub of subCategories">
+    <input type="checkbox"
+           [checked]="isSubCategorySelected(sub.id)"
+           (change)="toggleSubCategory(sub.id)" />
+    {{ sub.name }}
+  </label>
+</div>
 
     <button (click)="addService()">Add Service</button>
 
-    <!-- Service Area -->
+
     <select [(ngModel)]="serviceArea.type">
       <option value="">Select Area Type</option>
       <option value="city">City</option>
@@ -103,6 +91,78 @@
 <button (click)="closeServicesModal()">Cancel</button>
 
     <button (click)="saveServicesAndArea()">Save Changes</button>
+  </div>
+</div> -->
+
+<!-- DashboardComponent template -->
+
+<!-- Modal -->
+<div *ngIf="showServicesModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white p-6 rounded-lg max-w-xl w-full">
+    <h2 class="text-xl font-bold mb-4">Edit Services & Area</h2>
+
+    <!-- Category -->
+    <div class="mb-4">
+      <label class="block mb-1 font-semibold">Select Category</label>
+      <select [(ngModel)]="editCategoryId" (change)="onCategoryChange(editCategoryId!)"
+              class="border rounded p-2 w-full">
+        <option value="">Select Category</option>
+        <option *ngFor="let cat of parentCategories" [value]="cat.id">{{ cat.name }}</option>
+      </select>
+    </div>
+
+    <!-- Subcategories -->
+    <div class="mb-4" *ngIf="subCategories.length > 0">
+      <label class="block mb-1 font-semibold">Sub Categories</label>
+      <div *ngFor="let sub of subCategories" class="flex items-center mb-1">
+        <input type="checkbox" [checked]="isSubCategorySelected(sub.id)"
+               (change)="toggleSubCategory(sub.id)" class="mr-2"/>
+        {{ sub.name }}
+      </div>
+    </div>
+
+    <!-- Coverage Area -->
+    <div class="mb-4">
+      <label class="block mb-1 font-semibold">Coverage Area</label>
+      <select [(ngModel)]="serviceArea.type" class="border rounded p-2 w-full">
+        <option value="">Select Area Type</option>
+        <option value="city">City</option>
+        <option value="radius">Radius</option>
+        <option value="pincode">Pincode</option>
+      </select>
+
+      <div *ngIf="serviceArea.type === 'city'" class="mt-2">
+        <select [(ngModel)]="serviceArea.cityId" class="border rounded p-2 w-full">
+          <option *ngFor="let city of cities" [value]="city.id">{{ city.name }}</option>
+        </select>
+      </div>
+
+      <div *ngIf="serviceArea.type === 'radius'" class="mt-2">
+        <input type="number" [(ngModel)]="serviceArea.radiusKm" placeholder="Radius in KM"
+               class="border rounded p-2 w-full"/>
+      </div>
+
+      <div *ngIf="serviceArea.type === 'pincode'" class="mt-2">
+        <div class="flex gap-2">
+          <input [(ngModel)]="pincodeInput" placeholder="Enter pincode"
+                 class="border rounded p-2 flex-1"/>
+          <button class="bg-blue-500 text-white px-3 py-1 rounded" (click)="addPincode()">Add</button>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span *ngFor="let p of serviceArea.pincodes; let i = index"
+                class="bg-gray-200 px-2 py-1 rounded flex items-center">
+            {{ p }}
+            <button class="ml-1 text-red-500" (click)="removePincode(i)">x</button>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-2 mt-4">
+      <button class="bg-gray-300 px-3 py-1 rounded" (click)="closeServicesModal()">Cancel</button>
+      <button class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium font-inter whitespace-nowrap cursor-pointer" (click)="saveServicesAndArea()">Save Changes</button>
+    </div>
   </div>
 </div>
 
