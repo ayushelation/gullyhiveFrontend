@@ -1,6 +1,6 @@
 
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';
+// import { LoginComponent } from './login/login.component';
 import { RegisterLayoutComponent } from './register/register-layout/register-layout.component';
 import { RegisterComponent } from './register/register.component';
 // import { LandingPageComponent } from '../landing/landing.component';
@@ -10,10 +10,10 @@ export const AUTH_ROUTES: Routes = [
  //  { path: '', component: LandingPageComponent },
 
   // LOGIN PAGE
-  {
-    path: 'login',
-    component: LoginComponent
-  },
+  // {
+  //   path: 'login',
+  //   component: LoginComponent
+  // },
 
   // REGISTER PAGE WITH LAYOUT
   {
@@ -28,9 +28,9 @@ export const AUTH_ROUTES: Routes = [
   },
 
   // DEFAULT REDIRECT
-  {
-    path: '',
-    redirectTo: 'register',
-    pathMatch: 'full'
-  }
+  // {
+  //   path: '',
+  //   redirectTo: 'register',
+  //   pathMatch: 'full'
+  // }
 ];

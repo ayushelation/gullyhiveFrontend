@@ -5,9 +5,9 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-admin-footer',
   templateUrl: './footer.component.html',
-  standalone: true,
-  imports: [CommonModule]
+  // standalone: true,
+  // imports: [CommonModule]
 })
 export class FooterComponent {
-  currentYear = new Date().getFullYear();
+  currentYear: number = new Date().getFullYear();
 }
