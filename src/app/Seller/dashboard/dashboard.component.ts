@@ -15,46 +15,35 @@ export class DashboardComponent implements OnInit {
 
   constructor(private sellerService: SellerService) {}
 
-  // ngOnInit(): void {
-  //   this.loadDashboardData();
-  // }
 totalLeads = 0;
 totalResponses = 0;
 acceptedResponses = 0;
 pendingResponses = 0;
 
+
 ngOnInit() {
-   this.loadDashboardData();
-  // Load leads
-  this.sellerService.getLeads().subscribe(leads => {
-    this.totalLeads = leads.length;
-  });
+  this.sellerService.getDashboardData().subscribe(d => {
+    this.user = d;
+    this.sellerId = d.sellerId;
 
-  // Load responses
-  this.sellerService.getMyResponses(this.sellerId).subscribe(res => {
-    const responses = res.data;
-    this.totalResponses = responses.length;
-    this.acceptedResponses = responses.filter(r => r.status === 'accepted').length;
-    this.pendingResponses = responses.filter(r => r.status === 'pending').length;
-  });
-
-
-
-
-
-   // Load dashboard
-    this.sellerService.getDashboardData().subscribe(d => {
-      this.user = d;
-      this.sellerId = d.sellerId;
-
-      // Load services
-      this.loadProviderServices(this.sellerId);
+    // Leads
+    this.sellerService.getLeads().subscribe(leads => {
+      this.totalLeads = leads.length;
     });
 
-    // Load categories & cities
-    this.sellerService.getParentCategories().subscribe(res => this.parentCategories = res);
-    this.sellerService.getCities().subscribe(res => this.cities = res);
+    // Responses (NOW sellerId exists)
+    this.sellerService.getMyResponses(this.sellerId).subscribe(res => {
+      const responses = res.data;
+      this.totalResponses = responses.length;
+      this.acceptedResponses = responses.filter(r => r.status === 'accepted').length;
+      this.pendingResponses = responses.filter(r => r.status === 'pending').length;
+    });
+
+    // Load services
+    this.loadProviderServices(this.sellerId);
+  });
 }
+
 
   loadDashboardData(): void {
     this.sellerService.getDashboardData().subscribe({
@@ -66,14 +55,12 @@ ngOnInit() {
     });
   }
 
-
-
-
-
   // Services
   services: { categoryId: number; subCategoryIds: number[] }[] = [];
   selectedCategory: number | null = null;
-  selectedSubCategory: number | null = null;
+  //selectedSubCategory: number | null = null;
+  editCategoryId: number | null = null;
+  editSubCategoryIds: number[] = [];
 
   // Dropdown options
   parentCategories: any[] = [];
@@ -86,39 +73,39 @@ ngOnInit() {
     cityId?: number;
     radiusKm?: number;
     pincodes: string[];
-  } = { type: '', pincodes: [] };
+  } = { type: 'city', pincodes: [] };
 
   pincodeInput = '';
   showServicesModal = false;
 
 
- 
-onCategoryChange(categoryId: number, fetchSub = true) {
-  this.selectedCategory = categoryId;
+onCategoryChange(categoryId: number) {
+  this.editCategoryId = categoryId;
 
-  if (fetchSub) {
-    this.subCategories = [];
-    this.sellerService.getSubCategories(categoryId).subscribe(res => this.subCategories = res);
-  }
+  // Clear previously selected subcategories for new category
+  this.editSubCategoryIds = [];
 
-  // Pre-check subcategories if editing
-  const service = this.services.find(s => s.categoryId === categoryId);
-  this.selectedSubCategory = service?.subCategoryIds[0] || null;
+  // Fetch subcategories dynamically from API
+  this.sellerService.getSubCategories(categoryId).subscribe(subs => {
+    this.subCategories = subs;
+
+    // If this category already has selected subcategories in services, prefill
+    const existingService = this.services.find(s => s.categoryId === categoryId);
+    if (existingService) {
+      this.editSubCategoryIds = [...existingService.subCategoryIds];
+    }
+  });
 }
 
 toggleSubCategory(subId: number) {
-  if (!this.selectedCategory) return;
-
-  let service = this.services.find(s => s.categoryId === this.selectedCategory);
-  if (!service) {
-    service = { categoryId: this.selectedCategory, subCategoryIds: [] };
-    this.services.push(service);
-  }
-
-  const index = service.subCategoryIds.indexOf(subId);
-  if (index > -1) service.subCategoryIds.splice(index, 1);
-  else service.subCategoryIds.push(subId);
+  const index = this.editSubCategoryIds.indexOf(subId);
+  if (index > -1) this.editSubCategoryIds.splice(index, 1);
+  else this.editSubCategoryIds.push(subId);
 }
+isSubCategorySelected(subId: number): boolean {
+  return this.editSubCategoryIds.includes(subId);
+}
+
 addPincode() {
   if (this.pincodeInput && !this.serviceArea.pincodes.includes(this.pincodeInput)) {
     this.serviceArea.pincodes.push(this.pincodeInput);
@@ -129,23 +116,6 @@ addPincode() {
 removePincode(index: number) {
   this.serviceArea.pincodes.splice(index, 1);
 }
-addService() {
-  if (this.selectedCategory && this.selectedSubCategory) {
-    let service = this.services.find(s => s.categoryId === this.selectedCategory);
-    if (!service) {
-      service = { categoryId: this.selectedCategory, subCategoryIds: [] };
-      this.services.push(service);
-    }
-
-    if (!service.subCategoryIds.includes(this.selectedSubCategory)) {
-      service.subCategoryIds.push(this.selectedSubCategory);
-    }
-
-    // Reset selection
-    this.selectedCategory = null;
-    this.selectedSubCategory = null;
-  }
-}
 
 removeService(index: number) {
   this.services.splice(index, 1);
@@ -153,15 +123,18 @@ removeService(index: number) {
 
 
 loadProviderServices(providerId: number) {
-  this.sellerService.getProviderServices(providerId)
-    .subscribe((data: ProviderServicesResponse) => {
-      // Map API data to component format
-      this.services = data.services.map((s: ProviderService) => ({
+  this.sellerService.getProviderServices(providerId).subscribe({
+    next: (data) => {
+
+      console.log('Provider services API data:', data);
+
+      // ✅ FIXED HERE
+      this.services = data.providerServices.map(s => ({
         categoryId: s.categoryId,
         subCategoryIds: s.subCategoryIds
       }));
 
-      // Load service area
+      // ✅ service area
       if (data.serviceArea) {
         this.serviceArea = {
           type: data.serviceArea.type,
@@ -171,11 +144,17 @@ loadProviderServices(providerId: number) {
         };
       }
 
-      // Populate subcategories for first category (dropdown)
+      // ✅ load dropdown reference data
+      this.parentCategories = data.categories;
+      this.subCategories = data.subCategories;
+      this.cities = data.cities;
+
       if (this.services.length > 0) {
-        this.onCategoryChange(this.services[0].categoryId, false);
+        this.onCategoryChange(this.services[0].categoryId);
       }
-    });
+    },
+    error: err => console.error(err)
+  });
 }
 
 // dashboard.component.ts
@@ -186,12 +165,7 @@ getCategoryName(categoryId: number): string {
   return cat ? cat.name : '';
 }
 
-// Check if a subcategory is selected for a category
-isSubCategorySelected(categoryId: number | null, subId: number): boolean {
-  if (!categoryId) return false;
-  const service = this.services.find(s => s.categoryId === categoryId);
-  return service ? service.subCategoryIds.includes(subId) : false;
-}
+
 getSubCategoryName(subId: number): string {
   const sub = this.subCategories.find(sc => sc.id === subId);
   return sub ? sub.name : '';
@@ -205,46 +179,38 @@ getSubCategoryNames(service: { categoryId: number; subCategoryIds: number[] }): 
     .join(', ');
 }
 
-// Inside DashboardComponent
+
 openEditServices() {
   if (!this.sellerId) return;
 
-  // Fetch current services for this seller
   this.sellerService.getProviderServices(this.sellerId).subscribe({
     next: (data) => {
-      // Map API data to component format
-      this.services = data.services.map((s: ProviderService) => ({
-        categoryId: s.categoryId,
-        subCategoryIds: s.subCategoryIds
-      }));
+      this.services = data.providerServices ?? [];
+      this.parentCategories = data.categories ?? [];
+      this.cities = data.cities ?? [];
+      this.serviceArea = data.serviceArea ?? { type: '', pincodes: [] };
 
-      // Map service area
-      if (data.serviceArea) {
-        this.serviceArea = {
-          type: data.serviceArea.type,
-          cityId: data.serviceArea.cityId,
-          radiusKm: data.serviceArea.radiusKm,
-          pincodes: data.serviceArea.pincodes || []
-        };
-      }
-
-      // Pre-populate first category for dropdown
       if (this.services.length > 0) {
-        this.onCategoryChange(this.services[0].categoryId, false);
+        const firstService = this.services[0];
+        this.editCategoryId = firstService.categoryId;
+        this.editSubCategoryIds = [...firstService.subCategoryIds];
+
+        // Load subcategories dynamically
+        this.sellerService.getSubCategories(this.editCategoryId)
+          .subscribe(res => this.subCategories = res);
       }
 
-      // Show modal after data is loaded
-      this.showServicesModal = true;
+      this.showServicesModal = true; // ✅ open popup
     },
-    error: (err) => console.error('Failed to load services', err)
+    error: err => console.error(err)
   });
 }
+
 
 
 closeServicesModal() {
   this.showServicesModal = false;
 }
-
 
 saveServicesAndArea() {
   if (!this.sellerId) return;
@@ -265,6 +231,24 @@ saveServicesAndArea() {
   });
 }
 
+addService() {
+  if (!this.editCategoryId || this.editSubCategoryIds.length === 0) return;
+
+  const existing = this.services.find(s => s.categoryId === this.editCategoryId);
+  if (existing) {
+    existing.subCategoryIds = [...this.editSubCategoryIds];
+  } else {
+    this.services.push({
+      categoryId: this.editCategoryId,
+      subCategoryIds: [...this.editSubCategoryIds]
+    });
+  }
+
+  // reset selections
+  this.editCategoryId = null;
+  this.editSubCategoryIds = [];
+  this.subCategories = [];
+}
 
 }
 
